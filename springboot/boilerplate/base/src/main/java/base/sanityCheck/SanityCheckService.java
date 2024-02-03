@@ -8,12 +8,10 @@ import java.util.Scanner;
 
 import org.springframework.stereotype.Service;
 
-import base._global.event.BaseCreated;
 import base._global.logger.CustomLogger;
 import base._global.logger.CustomLoggerType;
 
 import base.sanityCheck.reqDtos.LogsReqDto;
-import base.sanityCheck.reqDtos.MockBaseCreatedReqDto;
 import base.sanityCheck.resDtos.LogsResDto;
 
 import lombok.RequiredArgsConstructor;
@@ -48,11 +46,5 @@ public class SanityCheckService {
             }
 
             return new LogsResDto(logs.subList(Math.max(logs.size()-logsReqDto.getLineLength(), 0), logs.size()));
-    }
-
-
-    // Policy 테스트용으로 BaseCreated 이벤트를 강제로 발생시키기 위해서
-    public void mockBaseCreated(MockBaseCreatedReqDto mockData) {
-        (new BaseCreated(mockData)).publish();
     }
 }

@@ -3,12 +3,14 @@ package base.sanityCheck;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import base._global.infra.AbstractEvent;
 import base._global.logger.CustomLogger;
 import base._global.logger.CustomLoggerType;
 
 import base.sanityCheck.exceptions.DivByZeroException;
 import base.sanityCheck.reqDtos.LogsReqDto;
-import base.sanityCheck.reqDtos.MockBaseCreatedReqDto;
 import base.sanityCheck.resDtos.AuthenticationCheckResDto;
 import base.sanityCheck.resDtos.LogsResDto;
 
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -97,11 +100,17 @@ public class SanityCheckController {
     }
 
 
-    // Policy 테스트용으로 BaseCreated 이벤트를 강제로 발생시키기 위해서
-    @PostMapping("/mock/BaseCreated")
-    public void mockBaseCreated(@RequestBody MockBaseCreatedReqDto mockData) {
-        CustomLogger.debug(CustomLoggerType.ENTER, "", String.format("{mockData: %s}", mockData.toString()));
-        this.sanityCheckService.mockBaseCreated(mockData);
-        CustomLogger.debug(CustomLoggerType.EXIT);
+    // Policy 테스트용으로 이벤트를 강제로 발생시키기 위해서
+    @PostMapping("/mock/{eventName}")
+    public void mockEvents(@PathVariable String eventName, @RequestBody String jsonData) {
+        try {
+            
+            Class<?> eventClass = Class.forName(String.format("base._global.event.%s", eventName));
+            AbstractEvent event = (AbstractEvent)((new ObjectMapper()).readValue(jsonData, eventClass));
+            event.publish();
+
+        } catch (Exception e) {
+            CustomLogger.error(e);
+        }
     }
 }
