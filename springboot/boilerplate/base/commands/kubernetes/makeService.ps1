@@ -1,0 +1,1 @@
+bash.exe ./commands/kubernetes/makeService.sh

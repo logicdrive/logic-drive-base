@@ -1,0 +1,1 @@
+bash.exe ./commands/hostRun.sh
